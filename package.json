@@ -1,0 +1,24 @@
+{
+  "name": "foldai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fold AI — A web UI + automation layer over OpenCode that runs a virtual company of AI agents",
+  "workspaces": [
+    "packages/server",
+    "packages/ui"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/server & npm run dev --workspace=packages/ui",
+    "dev:server": "npm run dev --workspace=packages/server",
+    "dev:ui": "npm run dev --workspace=packages/ui",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.18.23",
+    "ws": "^8.21.3"
+  }
+}
