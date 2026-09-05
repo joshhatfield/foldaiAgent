@@ -66,3 +66,22 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
 }
+
+/* Clean thin scrollbars for chat + page scrolling */
+[data-slot="message-scroller-viewport"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+[data-slot="message-scroller-viewport"]::-webkit-scrollbar {
+  width: 6px;
+}
+[data-slot="message-scroller-viewport"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-slot="message-scroller-viewport"]::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+[data-slot="message-scroller-viewport"]::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ring);
+}

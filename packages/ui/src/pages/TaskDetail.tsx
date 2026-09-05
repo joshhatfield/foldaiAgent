@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCompanyStore } from "../stores/company-store";
 import { useTaskStore } from "../stores/task-store";
 import { StatusBadge } from "../components/StatusBadge";
+import { ChatWindow } from "../components/chat/ChatWindow";
 import { api, type TaskStatus } from "../api/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -70,12 +71,12 @@ export function TaskDetail() {
   };
 
   return (
-    <div>
-      <Button variant="ghost" onClick={() => navigate("/tasks")} className="mb-4">
+    <div className="flex h-full min-h-0 flex-col gap-4">
+      <Button variant="ghost" onClick={() => navigate("/tasks")} className="w-fit shrink-0">
         &larr; Back to tasks
       </Button>
 
-      <Card>
+      <Card className="shrink-0">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold">{task.title}</h1>
@@ -142,6 +143,16 @@ export function TaskDetail() {
           )}
         </CardContent>
       </Card>
+
+      {/* Task discussion — single-session chat, no sidebar */}
+      <div className="min-h-[320px] flex-1">
+        <ChatWindow
+          scope={{ type: "task", id: task.id }}
+          companySlug={selectedSlug}
+          hideSidebar
+          className="h-full"
+        />
+      </div>
     </div>
   );
 }

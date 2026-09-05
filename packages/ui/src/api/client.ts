@@ -157,4 +157,90 @@ export const api = {
       put<{ success: boolean }>(`/companies/${slug}/cabinet/${id}/content`, { content }),
     remove: (slug: string, id: string) => del<{ success: boolean }>(`/companies/${slug}/cabinet/${id}`),
   },
+
+  // Chat
+  chat: {
+    listSessions: (slug: string, employeeId: string) =>
+      get<{ sessions: ChatSession[] }>(`/companies/${slug}/employees/${employeeId}/sessions`),
+    listTaskSessions: (slug: string, taskId: string) =>
+      get<{ sessions: ChatSession[] }>(`/companies/${slug}/tasks/${taskId}/sessions`),
+    createSession: (slug: string, employeeId: string, title?: string) =>
+      post<{ session: ChatSession }>(`/companies/${slug}/employees/${employeeId}/sessions`, { title }),
+    createTaskSession: (slug: string, taskId: string, title?: string) =>
+      post<{ session: ChatSession }>(`/companies/${slug}/tasks/${taskId}/sessions`, { title }),
+    getMessages: (slug: string, sessionId: string, limit?: number) =>
+      get<{ messages: ChatMessageEntry[] }>(
+        `/companies/${slug}/chat/sessions/${sessionId}/messages${limit != null ? `?limit=${limit}` : ''}`,
+      ),
+    send: (slug: string, sessionId: string, text: string) =>
+      post<{ ok: boolean; session: ChatSession }>(`/companies/${slug}/chat/sessions/${sessionId}/send`, { text }),
+    abort: (slug: string, sessionId: string) =>
+      post<{ ok: boolean }>(`/companies/${slug}/chat/sessions/${sessionId}/abort`, {}),
+    respondPermission: (slug: string, sessionId: string, permissionId: string, response: 'once' | 'always' | 'reject') =>
+      post<{ ok: boolean }>(`/companies/${slug}/chat/sessions/${sessionId}/permission`, { permissionId, response }),
+    renameSession: (slug: string, sessionId: string, name: string) =>
+      put<{ session: ChatSession }>(`/companies/${slug}/chat/sessions/${sessionId}`, { name }),
+    removeSession: (slug: string, sessionId: string) =>
+      del<{ success: boolean }>(`/companies/${slug}/chat/sessions/${sessionId}`),
+  },
 };
+
+// ---- Chat types (mirror OpenCode part model) ----
+
+export type ChatScopeType = 'employee' | 'task';
+
+export interface ChatSession {
+  id: string;
+  name: string;
+  scopeType: ChatScopeType;
+  scopeId: string;
+  opencodeSessionId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ToolStateStatus = 'pending' | 'running' | 'completed' | 'error';
+
+export interface ChatTextPart {
+  type: 'text';
+  id?: string;
+  text: string;
+  time?: { start: number; end?: number };
+}
+
+export interface ChatReasoningPart {
+  type: 'reasoning';
+  id?: string;
+  text: string;
+}
+
+export interface ChatToolPart {
+  type: 'tool';
+  id?: string;
+  callID?: string;
+  tool: string;
+  state: { status: ToolStateStatus; input?: unknown; output?: unknown };
+}
+
+export interface ChatStepPart {
+  type: 'step-start' | 'step-finish';
+  id?: string;
+}
+
+export type ChatPart = ChatTextPart | ChatReasoningPart | ChatToolPart | ChatStepPart;
+
+export interface ChatMessageInfo {
+  id: string;
+  role: 'user' | 'assistant';
+  sessionID?: string;
+  time?: { created: number; completed?: number };
+  error?: unknown;
+}
+
+/** Shape returned by GET /chat/sessions/:id/messages — { info, parts } pairs */
+export interface ChatMessageEntry {
+  info: ChatMessageInfo;
+  parts: ChatPart[];
+  /** Local optimistic entry awaiting WS echo — render dimmed until confirmed */
+  pending?: boolean;
+}

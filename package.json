@@ -16,5 +16,9 @@
   },
   "engines": {
     "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.18.23",
+    "ws": "^8.21.3"
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCompanyStore } from "../stores/company-store";
 import { useEmployeeStore } from "../stores/employee-store";
 import { Modal } from "../components/Modal";
@@ -11,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export function Employees() {
+  const navigate = useNavigate();
   const selectedSlug = useCompanyStore((s) => s.selectedSlug);
   const { employees, loading, load, create, update, remove } = useEmployeeStore();
   const [showCreate, setShowCreate] = useState(false);
@@ -62,7 +64,11 @@ export function Employees() {
       ) : (
         <div className="space-y-3">
           {employees.map((emp) => (
-            <Card key={emp.id}>
+            <Card
+              key={emp.id}
+              onClick={() => navigate(`/employees/${emp.id}`)}
+              className="cursor-pointer transition-colors hover:border-primary/50 hover:bg-accent/50"
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div>
@@ -74,11 +80,12 @@ export function Employees() {
                       className={emp.status === "available" ? "bg-emerald-600 hover:bg-emerald-600" : ""}>
                       {emp.status}
                     </Badge>
-                    <Button variant="ghost" size="sm" onClick={() => toggleStatus(emp.id, emp.status)}>
+                    <Button variant="ghost" size="sm"
+                      onClick={(e) => { e.stopPropagation(); void toggleStatus(emp.id, emp.status); }}>
                       toggle
                     </Button>
                     <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive"
-                      onClick={() => remove(selectedSlug, emp.id)}>
+                      onClick={(e) => { e.stopPropagation(); void remove(selectedSlug, emp.id); }}>
                       remove
                     </Button>
                   </div>
